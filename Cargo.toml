@@ -1,0 +1,21 @@
+[package]
+name = "makepad-element"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+description = "React Native Elements component library for Makepad"
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+makepad-widgets = { git = "https://github.com/makepad/makepad", branch = "dev" }
+resvg = "0.43.0"
+
+[dev-dependencies]
+
+[[example]]
+name = "element_zoo"
+path = "examples/element_zoo/src/main.rs"
+
+[[example]]
+name = "element_gallery"
+path = "examples/element_gallery/src/main.rs"
