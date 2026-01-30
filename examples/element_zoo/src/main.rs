@@ -6,6 +6,7 @@
 use makepad_widgets::*;
 use makepad_widgets::file_tree::*;
 use std::collections::HashMap;
+use makepad_element::components::rating::ElementRatingWidgetRefExt;
 
 live_design! {
     use link::theme::*;
@@ -729,6 +730,40 @@ live_design! {
                         <Label> { width: Fit, height: Fit, margin: {bottom: 16},
                             draw_text: { color: #333333, text_style: { font_size: 24.0 } } text: "Rating" }
 
+                        // Interactive Rating
+                        <Label> { width: Fit, height: Fit, margin: {top: 8},
+                            draw_text: { color: #666666, text_style: { font_size: 16.0 } } text: "Interactive (tap to rate):" }
+                        <View> { width: Fill, height: Fit, flow: Right, spacing: 16, align: {y: 0.5},
+                            interactive_rating = <ElementRating> {
+                                value: 3,
+                                filled_color: #faad14,
+                                empty_color: #bdc6cf,
+                            }
+                            rating_label = <Label> { width: Fit, height: Fit,
+                                draw_text: { color: #888888, text_style: { font_size: 14.0 } } text: "3 stars" }
+                        }
+
+                        // Read-only Rating
+                        <Label> { width: Fit, height: Fit, margin: {top: 16},
+                            draw_text: { color: #666666, text_style: { font_size: 16.0 } } text: "Read-only:" }
+                        <ElementRating> {
+                            value: 4,
+                            read_only: true,
+                        }
+
+                        // Custom colors
+                        <Label> { width: Fit, height: Fit, margin: {top: 16},
+                            draw_text: { color: #666666, text_style: { font_size: 16.0 } } text: "Custom colors:" }
+                        <ElementRating> {
+                            value: 2,
+                            filled_color: #e53935,
+                            empty_color: #ffcdd2,
+                        }
+
+                        // Static variants (legacy)
+                        <Label> { width: Fit, height: Fit, margin: {top: 24},
+                            draw_text: { color: #666666, text_style: { font_size: 16.0 } } text: "Static variants:" }
+
                         <Label> { width: Fit, height: Fit,
                             draw_text: { color: #888888, text_style: { font_size: 14.0 } } text: "0 stars" }
                         <ElementRating0> {}
@@ -1440,6 +1475,12 @@ impl MatchEvent for App {
         }
         if let Some(folder_id) = ft.folder_clicked(actions) {
             self.show_page_for_node(cx, folder_id);
+        }
+
+        // Handle interactive rating changes
+        if let Some(value) = self.ui.element_rating(ids!(interactive_rating)).changed(&actions) {
+            let text = format!("{} star{}", value, if value == 1 { "" } else { "s" });
+            self.ui.label(ids!(rating_label)).set_text(cx, &text);
         }
     }
 }
