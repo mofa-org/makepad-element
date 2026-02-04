@@ -7,11 +7,13 @@ use makepad_widgets::*;
 use makepad_widgets::file_tree::*;
 use std::collections::HashMap;
 use makepad_element::components::rating::ElementRatingWidgetRefExt;
+use makepad_element::{ThemeMode, apply_theme};
 
 live_design! {
     use link::theme::*;
     use link::shaders::*;
     use link::widgets::*;
+    use link::theme_colors::*;
 
     use makepad_element::components::text::*;
     use makepad_element::components::divider::*;
@@ -49,6 +51,7 @@ live_design! {
     // use makepad_element::components::curved_label::*; // BUG: widget doesn't render
     use makepad_element::components::staggered_grid::*;
     use makepad_element::theme::font::*;
+    use makepad_element::theme::live_theme::*;
 
     // Re-export Manrope font for use in this live_design! scope
     pub FONT_MANROPE = <ELEMENT_FONT_MANROPE> {}
@@ -58,6 +61,22 @@ live_design! {
     pub THEME_COLOR_LABEL_INNER_HOVER = #111111
     pub THEME_COLOR_LABEL_INNER_ACTIVE = #2089dc
     pub THEME_COLOR_TEXT = #333333
+
+    SectionHeader = <Label> {
+        width: Fit, height: Fit,
+        draw_text: {
+            text_style: <THEME_FONT_REGULAR> { font_size: 24.0 }
+            color: (FOREGROUND)
+        }
+    }
+
+    SubsectionLabel = <Label> {
+        width: Fit, height: Fit,
+        draw_text: {
+            text_style: <THEME_FONT_REGULAR> { font_size: 12.0 }
+            color: (MUTED_FOREGROUND)
+        }
+    }
 
     StaggeredGridDemo = {{StaggeredGridDemo}} {
         width: Fill, height: 400,
@@ -83,35 +102,35 @@ live_design! {
             node_height: 28.0,
             folder_node: {
                 draw_bg: {
-                    color_1: #f8f8fc,
-                    color_2: #f0f0f6,
+                    color_1: (CARD),
+                    color_2: (BACKGROUND),
                 }
                 draw_text: {
-                    color: #333333,
-                    color_active: #2089dc,
+                    color: (FOREGROUND),
+                    color_active: (PRIMARY),
                     text_style: <THEME_FONT_REGULAR> { font_size: 12.0 }
                 }
                 draw_icon: {
-                    color: #555555,
-                    color_active: #2089dc,
+                    color: (MUTED_FOREGROUND),
+                    color_active: (PRIMARY),
                 }
             }
             file_node: {
                 draw_bg: {
-                    color_1: #f8f8fc,
-                    color_2: #f0f0f6,
+                    color_1: (CARD),
+                    color_2: (BACKGROUND),
                 }
                 draw_text: {
-                    color: #555555,
-                    color_active: #2089dc,
+                    color: (MUTED_FOREGROUND),
+                    color_active: (PRIMARY),
                     text_style: <THEME_FONT_REGULAR> { font_size: 12.0 }
                 }
                 draw_icon: {
-                    color: #777777,
-                    color_active: #2089dc,
+                    color: (MUTED_FOREGROUND),
+                    color_active: (PRIMARY),
                 }
             }
-            filler: { draw_bg: { color: #f4f4fa } }
+            filler: { draw_bg: { color: (BACKGROUND) } }
         }
     }
 
@@ -121,36 +140,43 @@ live_design! {
             width: Fill,
             height: Fill,
 
-            draw_bg: {
-                fn pixel(self) -> vec4 {
-                    return #F1F1F7;
-                }
-            }
+            draw_bg: { color: (BACKGROUND) }
 
             body = <View> {
                 width: Fill,
                 height: Fill,
                 flow: Down,
 
-                // Header across the full width
-                header_bar = <View> {
-                    width: Fill, height: 56,
-                    flow: Right,
-                    padding: {left: 20, right: 20},
-                    align: {y: 0.5},
-                    show_bg: true,
-                    draw_bg: { color: #2089dc }
+                // Header area (based on makepad-component layout)
+                header_area = <View> {
+                    width: Fill, height: Fit,
+                    flow: Down,
+                    padding: { left: 24, right: 24, top: 24, bottom: 16 },
+                    spacing: 8,
 
-                    <Label> { width: Fit, height: Fit,
-                        draw_text: { color: #ffffff, text_style: <THEME_FONT_REGULAR> { font_size: 20.0 } }
-                        text: "Element Zoo" }
+                    <SectionHeader> { text: "Element Zoo" }
+                    <Label> {
+                        draw_text: {
+                            text_style: <THEME_FONT_REGULAR> { font_size: 14.0 }
+                            color: (MUTED_FOREGROUND)
+                        }
+                        text: "Select a component from the tree to preview"
+                    }
 
-                    <View> { width: Fill, height: Fit }
+                    <View> {
+                        width: Fill, height: Fit,
+                        flow: Right,
+                        align: { y: 0.5 },
+                        spacing: 8,
 
-                    <Label> { width: Fit, height: Fit,
-                        draw_text: { color: #ffffffcc, text_style: <THEME_FONT_REGULAR> { font_size: 12.0 } }
-                        text: "makepad-element component gallery" }
+                        <View> { width: Fill, height: Fit }
+                        <SubsectionLabel> { text: "Theme" }
+                        theme_toggle = <ElementSwitch> { }
+                        theme_label = <SubsectionLabel> { text: "Light" }
+                    }
                 }
+
+                <ElementDivider> { }
 
                 // Main area: tree + content
                 main_area = <View> {
@@ -175,10 +201,10 @@ live_design! {
                             flow: Down, spacing: 8,
 
                             <Label> { width: Fit, height: Fit,
-                                draw_text: { color: #333333, text_style: <THEME_FONT_REGULAR> { font_size: 28.0 } }
+                                draw_text: { color: (FOREGROUND), text_style: <THEME_FONT_REGULAR> { font_size: 28.0 } }
                                 text: "Element Zoo" }
                             <Label> { width: Fit, height: Fit,
-                                draw_text: { color: #888888, text_style: <THEME_FONT_REGULAR> { font_size: 14.0 } }
+                                draw_text: { color: (MUTED_FOREGROUND), text_style: <THEME_FONT_REGULAR> { font_size: 14.0 } }
                                 text: "Select a component from the tree to preview" }
                         }
 
@@ -1220,7 +1246,7 @@ live_design! {
                         <StaggeredGridDemo> {}
                     }
 
-                }
+                    } // content_panel
                 } // main_area
             }
         }
@@ -1449,18 +1475,29 @@ impl Widget for ComponentTree {
 }
 
 // App
-#[derive(Live, LiveHook)]
+#[derive(Live)]
 pub struct App {
     #[live]
     ui: WidgetRef,
 
     #[rust]
     node_to_page: HashMap<LiveId, LiveId>,
+
+    #[rust]
+    is_dark: bool,
+}
+
+impl LiveHook for App {
+    fn after_apply(&mut self, cx: &mut Cx, _apply: &mut Apply, _index: usize, _nodes: &[LiveNode]) {
+        self.sync_theme_ui(cx);
+    }
 }
 
 impl LiveRegister for App {
     fn live_register(cx: &mut Cx) {
         makepad_widgets::live_design(cx);
+        cx.link(live_id!(theme), live_id!(theme_desktop_light));
+        cx.link(live_id!(theme_colors), live_id!(theme_colors_light));
         makepad_element::live_design(cx);
     }
 }
@@ -1475,6 +1512,12 @@ impl AppMain for App {
 impl MatchEvent for App {
     fn handle_startup(&mut self, _cx: &mut Cx) {
         self.build_page_map();
+        self.is_dark = false;
+    }
+
+    fn handle_draw(&mut self, cx: &mut Cx, _event: &DrawEvent) {
+        // Sync theme toggle UI after live reloads
+        self.sync_theme_ui(cx);
     }
 
     fn handle_actions(&mut self, cx: &mut Cx, actions: &Actions) {
@@ -1485,6 +1528,14 @@ impl MatchEvent for App {
         }
         if let Some(folder_id) = ft.folder_clicked(actions) {
             self.show_page_for_node(cx, folder_id);
+        }
+
+        // Handle theme toggle switch
+        if let Some(on) = self.ui.check_box(ids!(theme_toggle)).changed(&actions) {
+            self.is_dark = on;
+            let mode = if on { ThemeMode::Dark } else { ThemeMode::Light };
+            apply_theme(cx, mode);
+            self.sync_theme_ui(cx);
         }
 
         // Handle interactive rating changes
@@ -1620,5 +1671,12 @@ impl App {
         if let Some(&page_id) = self.node_to_page.get(&node_id) {
             self.ui.view(&[page_id]).set_visible(cx, true);
         }
+    }
+
+    fn sync_theme_ui(&mut self, cx: &mut Cx) {
+        self.ui.check_box(ids!(theme_toggle)).set_active(cx, self.is_dark);
+        self.ui
+            .label(ids!(theme_label))
+            .set_text(cx, if self.is_dark { "Dark" } else { "Light" });
     }
 }

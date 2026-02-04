@@ -4,6 +4,7 @@ live_design! {
     use link::theme::*;
     use link::shaders::*;
     use link::widgets::*;
+    use link::theme_colors::*;
 
     // Element themed toggle switch with RNE primary color
     pub ElementSwitch = <Toggle> {
@@ -11,7 +12,7 @@ live_design! {
         height: Fit,
         text: ""
         draw_bg: {
-            color_active: #2089dc,
+            color_active: (PRIMARY),
         }
     }
 
@@ -20,7 +21,7 @@ live_design! {
         width: Fit,
         height: Fit,
         draw_bg: {
-            color_active: #2089dc,
+            color_active: (PRIMARY),
         }
     }
 }

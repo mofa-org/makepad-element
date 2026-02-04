@@ -6,13 +6,14 @@ live_design! {
     use link::widgets::*;
 
     use crate::theme::live_theme::*;
+    use link::theme_colors::*;
 
     // Solid button (primary)
     pub ElementButtonSolid = <ElementButtonBase> {
         draw_bg: {
-            color: #2089dc,
-            color_hover: #1975be,
-            color_down: #1461a0,
+            color: (PRIMARY),
+            color_hover: (PRIMARY_HOVER),
+            color_down: (PRIMARY_ACTIVE),
         }
     }
 
@@ -25,7 +26,7 @@ live_design! {
         draw_bg: {
             instance color: #ffffff00,
             instance color_hover: #2089dc10,
-            instance border_color: #2089dc,
+            instance border_color: (PRIMARY),
             instance border_radius: 3.0,
 
             fn pixel(self) -> vec4 {
@@ -40,7 +41,7 @@ live_design! {
             }
         }
         draw_text: {
-            color: #2089dc,
+            color: (PRIMARY),
             text_style: { font_size: 16.0 }
         }
     }
@@ -65,7 +66,7 @@ live_design! {
             }
         }
         draw_text: {
-            color: #2089dc,
+            color: (PRIMARY),
             text_style: { font_size: 16.0 }
         }
     }
@@ -73,32 +74,32 @@ live_design! {
     // Error/danger button
     pub ElementButtonError = <ElementButtonBase> {
         draw_bg: {
-            color: #ff190c,
-            color_hover: #d9150a,
+            color: (DANGER),
+            color_hover: (DANGER_HOVER),
         }
     }
 
     // Success button
     pub ElementButtonSuccess = <ElementButtonBase> {
         draw_bg: {
-            color: #52c41a,
-            color_hover: #46a817,
+            color: (SUCCESS),
+            color_hover: (SUCCESS_HOVER),
         }
     }
 
     // Secondary button
     pub ElementButtonSecondary = <ElementButtonBase> {
         draw_bg: {
-            color: #ad1457,
-            color_hover: #8e1148,
+            color: (SECONDARY),
+            color_hover: (SECONDARY_HOVER),
         }
     }
 
     // Warning button
     pub ElementButtonWarning = <ElementButtonBase> {
         draw_bg: {
-            color: #faad14,
-            color_hover: #e09a00,
+            color: (WARNING),
+            color_hover: (WARNING_HOVER),
         }
     }
 
@@ -106,12 +107,12 @@ live_design! {
     pub ElementButtonDisabled = <ElementButtonBase> {
         enabled: false,
         draw_bg: {
-            color: #e5e5e5,
-            color_hover: #e5e5e5,
-            color_down: #e5e5e5,
+            color: (DISABLED_BG),
+            color_hover: (DISABLED_BG),
+            color_down: (DISABLED_BG),
         }
         draw_text: {
-            color: #9e9e9e,
+            color: (DISABLED_TEXT),
         }
     }
 }
