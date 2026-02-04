@@ -4,6 +4,7 @@ live_design! {
     use link::theme::*;
     use link::shaders::*;
     use link::widgets::*;
+    use link::theme_colors::*;
 
     // ─── Base: Solid Button (rounded box with hover/down) ───
     // Overrides only the pixel shader; color fields are inherited from Button.
@@ -26,7 +27,7 @@ live_design! {
             }
         }
         draw_text: {
-            color: #ffffff,
+            color: (PRIMARY_FOREGROUND),
             text_style: { font_size: 16.0 }
         }
     }
@@ -50,7 +51,7 @@ live_design! {
             }
         }
         draw_text: {
-            color: #ffffff,
+            color: (PRIMARY_FOREGROUND),
             text_style: { font_size: 24.0 }
         }
     }
@@ -59,7 +60,7 @@ live_design! {
     pub ElementCircleViewBase = <View> {
         show_bg: true,
         draw_bg: {
-            instance bg_color: #2089dc,
+            instance bg_color: (PRIMARY),
 
             fn pixel(self) -> vec4 {
                 let sdf = Sdf2d::viewport(self.pos * self.rect_size);
@@ -79,8 +80,8 @@ live_design! {
 
         show_bg: true,
         draw_bg: {
-            instance bg_color: #ff190c,
-            instance border_color: #ffffff,
+            instance bg_color: (DANGER),
+            instance border_color: (CARD),
 
             fn pixel(self) -> vec4 {
                 let sdf = Sdf2d::viewport(self.pos * self.rect_size);

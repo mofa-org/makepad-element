@@ -7,11 +7,13 @@ use makepad_widgets::*;
 use makepad_widgets::file_tree::*;
 use std::collections::HashMap;
 use makepad_element::components::rating::ElementRatingWidgetRefExt;
+use makepad_element::{ThemeMode, apply_theme};
 
 live_design! {
     use link::theme::*;
     use link::shaders::*;
     use link::widgets::*;
+    use link::theme_colors::*;
 
     use makepad_element::components::text::*;
     use makepad_element::components::divider::*;
@@ -60,6 +62,22 @@ live_design! {
     pub THEME_COLOR_LABEL_INNER_ACTIVE = #2089dc
     pub THEME_COLOR_TEXT = #333333
 
+    SectionHeader = <Label> {
+        width: Fit, height: Fit,
+        draw_text: {
+            text_style: <THEME_FONT_REGULAR> { font_size: 24.0 }
+            color: (FOREGROUND)
+        }
+    }
+
+    SubsectionLabel = <Label> {
+        width: Fit, height: Fit,
+        draw_text: {
+            text_style: <THEME_FONT_REGULAR> { font_size: 12.0 }
+            color: (MUTED_FOREGROUND)
+        }
+    }
+
     StaggeredGridDemo = {{StaggeredGridDemo}} {
         width: Fill, height: 400,
         grid = <ElementStaggeredGrid> {
@@ -84,35 +102,35 @@ live_design! {
             node_height: 28.0,
             folder_node: {
                 draw_bg: {
-                    color_1: #f8f8fc,
-                    color_2: #f0f0f6,
+                    color_1: (CARD),
+                    color_2: (BACKGROUND),
                 }
                 draw_text: {
-                    color: #333333,
-                    color_active: #2089dc,
+                    color: (FOREGROUND),
+                    color_active: (PRIMARY),
                     text_style: <THEME_FONT_REGULAR> { font_size: 12.0 }
                 }
                 draw_icon: {
-                    color: #555555,
-                    color_active: #2089dc,
+                    color: (MUTED_FOREGROUND),
+                    color_active: (PRIMARY),
                 }
             }
             file_node: {
                 draw_bg: {
-                    color_1: #f8f8fc,
-                    color_2: #f0f0f6,
+                    color_1: (CARD),
+                    color_2: (BACKGROUND),
                 }
                 draw_text: {
-                    color: #555555,
-                    color_active: #2089dc,
+                    color: (MUTED_FOREGROUND),
+                    color_active: (PRIMARY),
                     text_style: <THEME_FONT_REGULAR> { font_size: 12.0 }
                 }
                 draw_icon: {
-                    color: #777777,
-                    color_active: #2089dc,
+                    color: (MUTED_FOREGROUND),
+                    color_active: (PRIMARY),
                 }
             }
-            filler: { draw_bg: { color: #f4f4fa } }
+            filler: { draw_bg: { color: (BACKGROUND) } }
         }
     }
 
@@ -122,54 +140,43 @@ live_design! {
             width: Fill,
             height: Fill,
 
-            draw_bg: {
-                fn pixel(self) -> vec4 {
-                    return #F1F1F7;
-                }
-            }
+            draw_bg: { color: (BACKGROUND) }
 
             body = <View> {
                 width: Fill,
                 height: Fill,
                 flow: Down,
 
-                // Header across the full width
-                header_bar = <View> {
-                    width: Fill, height: 56,
-                    flow: Right,
-                    padding: {left: 20, right: 20},
-                    align: {y: 0.5},
-                    show_bg: true,
-                    draw_bg: { color: #2089dc }
+                // Header area (based on makepad-component layout)
+                header_area = <View> {
+                    width: Fill, height: Fit,
+                    flow: Down,
+                    padding: { left: 24, right: 24, top: 24, bottom: 16 },
+                    spacing: 8,
 
-                    <Label> { width: Fit, height: Fit,
-                        draw_text: { color: #ffffff, text_style: <THEME_FONT_REGULAR> { font_size: 20.0 } }
-                        text: "Element Zoo" }
-
-                    <View> { width: Fill, height: Fit }
-
-                    // Theme toggle button
-                    theme_toggle = <Button> {
-                        width: Fit, height: Fit,
-                        padding: {left: 12, right: 12, top: 6, bottom: 6},
-                        draw_bg: {
-                            fn pixel(self) -> vec4 {
-                                let sdf = Sdf2d::viewport(self.pos * self.rect_size);
-                                sdf.box(0., 0., self.rect_size.x, self.rect_size.y, 4.0);
-                                sdf.fill(mix(#ffffff33, #ffffff55, self.hover));
-                                return sdf.result;
-                            }
+                    <SectionHeader> { text: "Element Zoo" }
+                    <Label> {
+                        draw_text: {
+                            text_style: <THEME_FONT_REGULAR> { font_size: 14.0 }
+                            color: (MUTED_FOREGROUND)
                         }
-                        draw_text: { color: #ffffff, text_style: <THEME_FONT_REGULAR> { font_size: 12.0 } }
-                        text: "Dark Mode"
+                        text: "Select a component from the tree to preview"
                     }
 
-                    <View> { width: 12, height: Fit }
+                    <View> {
+                        width: Fill, height: Fit,
+                        flow: Right,
+                        align: { y: 0.5 },
+                        spacing: 8,
 
-                    <Label> { width: Fit, height: Fit,
-                        draw_text: { color: #ffffffcc, text_style: <THEME_FONT_REGULAR> { font_size: 12.0 } }
-                        text: "makepad-element component gallery" }
+                        <View> { width: Fill, height: Fit }
+                        <SubsectionLabel> { text: "Theme" }
+                        theme_toggle = <ElementSwitch> { }
+                        theme_label = <SubsectionLabel> { text: "Light" }
+                    }
                 }
+
+                <ElementDivider> { }
 
                 // Main area: tree + content
                 main_area = <View> {
@@ -194,10 +201,10 @@ live_design! {
                             flow: Down, spacing: 8,
 
                             <Label> { width: Fit, height: Fit,
-                                draw_text: { color: #333333, text_style: <THEME_FONT_REGULAR> { font_size: 28.0 } }
+                                draw_text: { color: (FOREGROUND), text_style: <THEME_FONT_REGULAR> { font_size: 28.0 } }
                                 text: "Element Zoo" }
                             <Label> { width: Fit, height: Fit,
-                                draw_text: { color: #888888, text_style: <THEME_FONT_REGULAR> { font_size: 14.0 } }
+                                draw_text: { color: (MUTED_FOREGROUND), text_style: <THEME_FONT_REGULAR> { font_size: 14.0 } }
                                 text: "Select a component from the tree to preview" }
                         }
 
@@ -1239,172 +1246,7 @@ live_design! {
                         <StaggeredGridDemo> {}
                     }
 
-                    // 35. Dark Theme
-                    dark_theme_detail_page = <ScrollXYView> {
-                        visible: false,
-                        width: Fill, height: Fill, flow: Down,
-                        padding: 0, spacing: 0,
-
-                        // Dark background container
-                        <View> {
-                            width: Fill, height: Fit,
-                            flow: Down, spacing: 16,
-                            padding: {left: 16, right: 16, top: 16, bottom: 24},
-                            show_bg: true,
-                            draw_bg: { color: #111114 }
-
-                            <Label> { width: Fit, height: Fit, margin: {bottom: 8},
-                                draw_text: { color: #f2f2f2, text_style: { font_size: 24.0 } } text: "Dark Theme" }
-                            <Label> { width: Fit, height: Fit,
-                                draw_text: { color: #9e9e9e, text_style: { font_size: 14.0 } }
-                                text: "Dark theme component variants following React Native Elements darkColors." }
-
-                            // Buttons
-                            <Label> { width: Fit, height: Fit, margin: {top: 16},
-                                draw_text: { color: #bdc6cf, text_style: { font_size: 14.0 } } text: "Buttons" }
-                            <View> { width: Fill, height: Fit, flow: Right, spacing: 12,
-                                <ElementButtonBaseDark> { text: "Primary" }
-                                <ElementButtonBaseDark> {
-                                    draw_bg: { color: #aa49eb, color_hover: #bb6aef, color_down: #8a39cb }
-                                    text: "Secondary"
-                                }
-                                <ElementButtonBaseDark> {
-                                    draw_bg: { color: #439946, color_hover: #54aa59, color_down: #357a38 }
-                                    text: "Success"
-                                }
-                            }
-
-                            // Cards
-                            <Label> { width: Fit, height: Fit, margin: {top: 16},
-                                draw_text: { color: #bdc6cf, text_style: { font_size: 14.0 } } text: "Card" }
-                            <ElementCardBaseDark> {
-                                flow: Down, spacing: 8,
-                                <Label> { draw_text: { color: #f2f2f2, text_style: { font_size: 16.0 } } text: "Dark Card Title" }
-                                <Label> { draw_text: { color: #9e9e9e, text_style: { font_size: 14.0 } }
-                                    text: "This is a dark theme card with proper contrast." }
-                            }
-
-                            // Progress & Skeleton
-                            <Label> { width: Fit, height: Fit, margin: {top: 16},
-                                draw_text: { color: #bdc6cf, text_style: { font_size: 14.0 } } text: "Progress & Skeleton" }
-                            <ElementLinearProgressBaseDark> { draw_bg: { progress: 0.65 } }
-                            <View> { width: Fill, height: 8 }
-                            <ElementSkeletonBaseDark> { width: Fill, height: 16 }
-                            <View> { width: Fill, height: 4 }
-                            <ElementSkeletonBaseDark> { width: 200, height: 16 }
-
-                            // Badges & Chips
-                            <Label> { width: Fit, height: Fit, margin: {top: 16},
-                                draw_text: { color: #bdc6cf, text_style: { font_size: 14.0 } } text: "Badges & Chips" }
-                            <View> { width: Fill, height: Fit, flow: Right, spacing: 12, align: {y: 0.5},
-                                <ElementBadgeBaseDark> { label = { text: "3" } }
-                                <ElementBadgeBaseDark> { label = { text: "99+" } }
-                                <ElementChipBaseDark> {
-                                    <Label> { draw_text: { color: #f2f2f2, text_style: { font_size: 13.0 } } text: "Dark Chip" }
-                                }
-                            }
-
-                            // List Items
-                            <Label> { width: Fit, height: Fit, margin: {top: 16},
-                                draw_text: { color: #bdc6cf, text_style: { font_size: 14.0 } } text: "List Items" }
-                            <ElementListItemBaseDark> {
-                                <View> { width: Fill, height: Fit, flow: Down, spacing: 2,
-                                    <Label> { draw_text: { color: #f2f2f2, text_style: { font_size: 14.0 } } text: "Dark List Item" }
-                                    <Label> { draw_text: { color: #9e9e9e, text_style: { font_size: 12.0 } } text: "Subtitle text" }
-                                }
-                                <ElementChevronRightDark> {}
-                            }
-                            <ElementDividerDark> {}
-                            <ElementListItemBaseDark> {
-                                <ElementCircleViewBaseDark> {
-                                    width: 40, height: 40, align: {x: 0.5, y: 0.5},
-                                    <Label> { draw_text: { color: #f2f2f2, text_style: { font_size: 14.0 } } text: "JD" }
-                                }
-                                <View> { width: Fill, height: Fit, flow: Down, spacing: 2, margin: {left: 12},
-                                    <Label> { draw_text: { color: #f2f2f2, text_style: { font_size: 14.0 } } text: "John Doe" }
-                                    <Label> { draw_text: { color: #9e9e9e, text_style: { font_size: 12.0 } } text: "john@example.com" }
-                                }
-                                <ElementChevronRightDark> {}
-                            }
-
-                            // Input
-                            <Label> { width: Fit, height: Fit, margin: {top: 16},
-                                draw_text: { color: #bdc6cf, text_style: { font_size: 14.0 } } text: "Input" }
-                            <ElementInputBaseDark> {
-                                <Label> { draw_text: { color: #757575, text_style: { font_size: 14.0 } } text: "Enter text..." }
-                            }
-
-                            // Dialog
-                            <Label> { width: Fit, height: Fit, margin: {top: 16},
-                                draw_text: { color: #bdc6cf, text_style: { font_size: 14.0 } } text: "Dialog" }
-                            <ElementDialogBaseDark> {
-                                flow: Down, spacing: 12,
-                                <Label> { draw_text: { color: #f2f2f2, text_style: { font_size: 18.0 } } text: "Dark Dialog" }
-                                <Label> { draw_text: { color: #9e9e9e, text_style: { font_size: 14.0 } }
-                                    text: "This is a dialog with dark theme styling." }
-                                <View> { width: Fill, height: Fit, flow: Right, spacing: 8, align: {x: 1.0},
-                                    <ElementButtonBaseDark> {
-                                        draw_bg: { color: #393e42, color_hover: #43484d, color_down: #2e3236 }
-                                        text: "Cancel"
-                                    }
-                                    <ElementButtonBaseDark> { text: "Confirm" }
-                                }
-                            }
-
-                            // Tooltip
-                            <Label> { width: Fit, height: Fit, margin: {top: 16},
-                                draw_text: { color: #bdc6cf, text_style: { font_size: 14.0 } } text: "Tooltip" }
-                            <ElementTooltipBaseDark> {
-                                <Label> { draw_text: { color: #f2f2f2, text_style: { font_size: 12.0 } } text: "Dark tooltip message" }
-                            }
-
-                            // Header
-                            <Label> { width: Fit, height: Fit, margin: {top: 16},
-                                draw_text: { color: #bdc6cf, text_style: { font_size: 14.0 } } text: "Header" }
-                        }
-                        <ElementHeaderBaseDark> {
-                            bar = { center = { title = { text: "Dark Header" } } }
-                        }
-
-                        // Tab Bar
-                        <View> {
-                            width: Fill, height: Fit,
-                            padding: {left: 16, right: 16, top: 16, bottom: 16},
-                            show_bg: true,
-                            draw_bg: { color: #111114 }
-                            flow: Down, spacing: 8,
-
-                            <Label> { width: Fit, height: Fit,
-                                draw_text: { color: #bdc6cf, text_style: { font_size: 14.0 } } text: "Tab Bar" }
-                        }
-                        <ElementTabBarDark> {
-                            bar = {
-                                <Label> { padding: {left: 16, right: 16, top: 8, bottom: 8},
-                                    draw_text: { color: #f2f2f2, text_style: { font_size: 14.0 } } text: "Tab 1" }
-                                <Label> { padding: {left: 16, right: 16, top: 8, bottom: 8},
-                                    draw_text: { color: #9e9e9e, text_style: { font_size: 14.0 } } text: "Tab 2" }
-                                <Label> { padding: {left: 16, right: 16, top: 8, bottom: 8},
-                                    draw_text: { color: #9e9e9e, text_style: { font_size: 14.0 } } text: "Tab 3" }
-                            }
-                        }
-
-                        // Search Bar
-                        <View> {
-                            width: Fill, height: Fit,
-                            padding: {left: 16, right: 16, top: 16, bottom: 24},
-                            show_bg: true,
-                            draw_bg: { color: #111114 }
-                            flow: Down, spacing: 8,
-
-                            <Label> { width: Fit, height: Fit,
-                                draw_text: { color: #bdc6cf, text_style: { font_size: 14.0 } } text: "Search Bar" }
-                            <ElementSearchBarBaseDark> {
-                                <Label> { draw_text: { color: #757575, text_style: { font_size: 14.0 } } text: "Search..." }
-                            }
-                        }
-                    }
-
-                }
+                    } // content_panel
                 } // main_area
             }
         }
@@ -1523,7 +1365,6 @@ impl ComponentTree {
             ("FadingBar", &["Vertical", "Horizontal"]),
             // CurvedLabel removed — BUG: draw_abs does not render inside turtle context
             ("StaggeredGrid", &["2-Column Masonry"]),
-            ("DarkTheme", &["Buttons", "Cards", "Progress", "Badges", "ListItems", "Dialog"]),
         ];
 
         let tiers: &[(&str, &[usize])] = &[
@@ -1532,7 +1373,6 @@ impl ComponentTree {
             ("Tier 3: Composite", &[11, 12, 13, 14, 15, 16, 17, 18, 19]),
             ("Tier 4: Advanced", &[20, 21, 22, 23, 24, 25, 26, 27, 28, 29]),
             ("Tier 5: Wonderous", &[30, 31, 32, 33]),
-            ("Tier 6: Theme", &[34]),
         ];
 
         let mut root_edges = Vec::new();
@@ -1616,7 +1456,7 @@ impl Widget for ComponentTree {
         self.ensure_built();
         while self.file_tree.draw_walk(cx, scope, walk).is_step() {
             // Open tier folders by default
-            for tier_name in &["Tier 1: Basic", "Tier 2: Form", "Tier 3: Composite", "Tier 4: Advanced", "Tier 6: Theme"] {
+            for tier_name in &["Tier 1: Basic", "Tier 2: Form", "Tier 3: Composite", "Tier 4: Advanced"] {
                 let tier_id = LiveId::from_str(tier_name);
                 self.file_tree.set_folder_is_open(cx, tier_id, true, Animate::No);
             }
@@ -1635,7 +1475,7 @@ impl Widget for ComponentTree {
 }
 
 // App
-#[derive(Live, LiveHook)]
+#[derive(Live)]
 pub struct App {
     #[live]
     ui: WidgetRef,
@@ -1644,12 +1484,20 @@ pub struct App {
     node_to_page: HashMap<LiveId, LiveId>,
 
     #[rust]
-    is_dark_mode: bool,
+    is_dark: bool,
+}
+
+impl LiveHook for App {
+    fn after_apply(&mut self, cx: &mut Cx, _apply: &mut Apply, _index: usize, _nodes: &[LiveNode]) {
+        self.sync_theme_ui(cx);
+    }
 }
 
 impl LiveRegister for App {
     fn live_register(cx: &mut Cx) {
         makepad_widgets::live_design(cx);
+        cx.link(live_id!(theme), live_id!(theme_desktop_light));
+        cx.link(live_id!(theme_colors), live_id!(theme_colors_light));
         makepad_element::live_design(cx);
     }
 }
@@ -1664,6 +1512,12 @@ impl AppMain for App {
 impl MatchEvent for App {
     fn handle_startup(&mut self, _cx: &mut Cx) {
         self.build_page_map();
+        self.is_dark = false;
+    }
+
+    fn handle_draw(&mut self, cx: &mut Cx, _event: &DrawEvent) {
+        // Sync theme toggle UI after live reloads
+        self.sync_theme_ui(cx);
     }
 
     fn handle_actions(&mut self, cx: &mut Cx, actions: &Actions) {
@@ -1676,10 +1530,12 @@ impl MatchEvent for App {
             self.show_page_for_node(cx, folder_id);
         }
 
-        // Handle theme toggle button
-        if self.ui.button(ids!(theme_toggle)).clicked(&actions) {
-            self.is_dark_mode = !self.is_dark_mode;
-            self.apply_theme(cx);
+        // Handle theme toggle switch
+        if let Some(on) = self.ui.check_box(ids!(theme_toggle)).changed(&actions) {
+            self.is_dark = on;
+            let mode = if on { ThemeMode::Dark } else { ThemeMode::Light };
+            apply_theme(cx, mode);
+            self.sync_theme_ui(cx);
         }
 
         // Handle interactive rating changes
@@ -1731,7 +1587,6 @@ impl App {
             ("BlurView", "blur_view_detail_page"),
             ("FadingBar", "fading_bar_detail_page"),
             ("StaggeredGrid", "staggered_grid_detail_page"),
-            ("DarkTheme", "dark_theme_detail_page"),
         ];
 
         let variations: &[(&str, &[&str])] = &[
@@ -1769,7 +1624,6 @@ impl App {
             ("BlurView", &["Single Stage", "4-Stage Cascade"]),
             ("FadingBar", &["Vertical", "Horizontal"]),
             ("StaggeredGrid", &["2-Column Masonry"]),
-            ("DarkTheme", &["Buttons", "Cards", "Progress", "Badges", "ListItems", "Dialog"]),
         ];
 
         for (comp_name, page_name) in components {
@@ -1802,7 +1656,7 @@ impl App {
             "pricing_card_detail_page", "skeleton_detail_page", "speed_dial_detail_page",
             "social_icon_detail_page", "markdown_detail_page", "svg_detail_page",
             "fade_view_detail_page", "blur_view_detail_page", "fading_bar_detail_page",
-            "staggered_grid_detail_page", "dark_theme_detail_page",
+            "staggered_grid_detail_page",
         ].iter().map(|s| LiveId::from_str(s)).collect()
     }
 
@@ -1819,44 +1673,10 @@ impl App {
         }
     }
 
-    fn apply_theme(&mut self, cx: &mut Cx) {
-        if self.is_dark_mode {
-            // Dark theme
-            self.ui.view(ids!(header_bar)).apply_over(cx, live! {
-                draw_bg: { color: #1e1e22 }
-            });
-            self.ui.button(ids!(theme_toggle)).apply_over(cx, live! {
-                draw_text: { color: #f2f2f2 }
-                text: "Light Mode"
-            });
-            self.ui.view(ids!(content_panel)).apply_over(cx, live! {
-                show_bg: true,
-                draw_bg: { color: #111114 }
-            });
-            self.ui.view(ids!(welcome_page)).apply_over(cx, live! {
-                show_bg: true,
-                draw_bg: { color: #111114 }
-            });
-            // Update welcome page labels
-            self.ui.label(ids!(welcome_page.Label)).apply_over(cx, live! {
-                draw_text: { color: #f2f2f2 }
-            });
-        } else {
-            // Light theme
-            self.ui.view(ids!(header_bar)).apply_over(cx, live! {
-                draw_bg: { color: #2089dc }
-            });
-            self.ui.button(ids!(theme_toggle)).apply_over(cx, live! {
-                draw_text: { color: #ffffff }
-                text: "Dark Mode"
-            });
-            self.ui.view(ids!(content_panel)).apply_over(cx, live! {
-                show_bg: false,
-            });
-            self.ui.view(ids!(welcome_page)).apply_over(cx, live! {
-                show_bg: false,
-            });
-        }
-        self.ui.redraw(cx);
+    fn sync_theme_ui(&mut self, cx: &mut Cx) {
+        self.ui.check_box(ids!(theme_toggle)).set_active(cx, self.is_dark);
+        self.ui
+            .label(ids!(theme_label))
+            .set_text(cx, if self.is_dark { "Dark" } else { "Light" });
     }
 }
